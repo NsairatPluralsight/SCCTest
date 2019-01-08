@@ -88,17 +88,7 @@ export class ConfigurationService {
   */
   async getIoTDevice(message: Message) {
     try {
-      let params = new Array<KeyValue>();
-
-      if(message.payload.deviceID) {
-        params.push(new KeyValue('ID', message.payload.deviceID));
-      }
-      if(message.payload.branchID) {
-        params.push(new KeyValue('QueueBranch_ID', message.payload.branchID));
-      }
-      if(message.payload.typeName) {
-        params.push(new KeyValue('TypeName', message.payload.typeName));
-      }
+      let params = await this.getParameters(message.payload);
 
       let deviceRepo = new DeviceRepository();
       let data = await deviceRepo.get(new IoTComponent(), params);
@@ -119,11 +109,11 @@ export class ConfigurationService {
     }
   }
 
-/**
-  * @summary get list of IOT devices
-  * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
-  * @return {Promise<Result>} Result enum wrapped in a promise.
-  */
+  /**
+    * @summary get list of IOT devices
+    * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
+    * @return {Promise<Result>} Result enum wrapped in a promise.
+    */
   async getAllIoTTypes(message: Message) {
     try {
       let deviceRepo = new IoTTypeRepository();
@@ -152,35 +142,28 @@ export class ConfigurationService {
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
- async getIoTType(message: Message) {
-  try {
-    let params = new Array<KeyValue>();
+  async getIoTType(message: Message) {
+    try {
+      let params = await this.getParameters(message.payload);
 
-    if(message.payload.deviceID) {
-      params.push(new KeyValue('ID', message.payload.deviceID));
+      let deviceRepo = new IoTTypeRepository();
+      let data = await deviceRepo.get(new IoTComponentType(), params);
+      let payload = new ResponsePayload();
+
+      if (data) {
+        payload.data = JSON.stringify(data);
+        payload.result = Result.Success;
+      } else {
+        payload.result = Result.Failed
+      }
+      message.payload = payload;
+
+      return message.payload.result;
+    } catch (error) {
+      Logger.error(error);
+      return Result.Failed;
     }
-    if(message.payload.typeName) {
-      params.push(new KeyValue('TypeName', message.payload.typeName));
-    }
-
-    let deviceRepo = new IoTTypeRepository();
-    let data = await deviceRepo.get(new IoTComponentType(), params);
-    let payload = new ResponsePayload();
-
-    if (data) {
-      payload.data = JSON.stringify(data);
-      payload.result = Result.Success;
-    } else {
-      payload.result = Result.Failed
-    }
-    message.payload = payload;
-
-    return message.payload.result;
-  } catch (error) {
-    Logger.error(error);
-    return Result.Failed;
   }
-}
 
   /**
   * @summary set IOT device config by device ID
@@ -189,22 +172,13 @@ export class ConfigurationService {
   */
   async setConfig(message: Message) {
     try {
-      let params = new Array<KeyValue>();
-      if (message.payload.deviceID) {
-        params.push(new KeyValue('ID', message.payload.deviceID));
-      }
-      if (message.payload.typeName) {
-        params.push(new KeyValue('TypeName', message.payload.typeName));
-      }
-      if (message.payload.data) {
-        params.push(new KeyValue('Configuration', message.payload.data));
-      }
+      let params = await this.getParameters(message.payload);
 
       let validator = new JsonValidator();
       let isValid = await validator.validate(JSON.parse(message.payload.data), message.payload.typeName, PropertyType.Configuration);
 
       let result = Result.Failed;
-      if(isValid) {
+      if (isValid) {
         let deviceRepo = new DeviceRepository();
         result = await deviceRepo.updateConfig(params);
 
@@ -230,13 +204,7 @@ export class ConfigurationService {
   */
   async getConfig(message: Message) {
     try {
-      let params = new Array<KeyValue>();
-      if (message.payload.deviceID) {
-        params.push(new KeyValue('ID', message.payload.deviceID));
-      }
-      if (message.payload.typeName) {
-        params.push(new KeyValue('TypeName', message.payload.typeName));
-      }
+      let params = await this.getParameters(message.payload);
 
       let deviceRepo = new DeviceRepository();
       let data = await deviceRepo.getColumn(params, 'configuration');
@@ -300,6 +268,28 @@ export class ConfigurationService {
     } catch (error) {
       Logger.error(error);
       return false;
+    }
+  }
+
+  async getParameters(payload: any) {
+    try {
+      let params = new Array<KeyValue>();
+      if (payload.deviceID) {
+        params.push(new KeyValue('ID', payload.deviceID));
+      }
+      if (payload.typeName) {
+        params.push(new KeyValue('TypeName', payload.typeName));
+      }
+      if (payload.branchID) {
+        params.push(new KeyValue('QueueBranch_ID', payload.branchID));
+      }
+      if (payload.data) {
+        params.push(new KeyValue('Configuration', payload.data));
+      }
+      return params;
+    } catch (error) {
+      Logger.error(error);
+      return null;
     }
   }
 }
