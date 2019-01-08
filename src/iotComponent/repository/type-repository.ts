@@ -47,10 +47,8 @@ export class IoTTypeRepository implements IRepository<IoTComponentType> {
 
   async get(entity: IoTComponentType, params: KeyValue[]): Promise<IoTComponentType> {
     try {
-      let paramsArray = new Array<DBParameters>();
-      let sqlCondition = new KeyValue('sqlCondition', '');
-      await DatabaseHelper.prepareCondition(params, paramsArray, sqlCondition);
-
+      let paramsArray = await DatabaseHelper.getParameters(params);
+      let sqlCondition = await DatabaseHelper.prepareCondition(params);
       let tableName = await DatabaseHelper.getTableName(entity);
       let attributesStr = await DatabaseHelper.getEntityAttributes(entity);
 

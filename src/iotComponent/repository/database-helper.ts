@@ -24,16 +24,19 @@ export class DatabaseHelper {
     }
   }
 
-  static async prepareCondition(params: Array<KeyValue>, dbParameters: Array<DBParameters>, condition: KeyValue): Promise<void> {
+  static async prepareCondition(params: Array<KeyValue>): Promise<KeyValue> {
     try {
-      condition.value = 'where ';
+      let sqlCondition = new KeyValue('sqlCondition', 'where ');
+
       params.forEach(element => {
-        condition.value += `${element.key} = @${element.key} and `;
-        dbParameters.push(new DBParameters(element.key, element.value, this.getDBType(element.key)));
+        sqlCondition.value += `${element.key} = @${element.key} and `;
       });
-      condition.value = condition.value.substring(0, condition.value.lastIndexOf('and'));
+      sqlCondition.value = sqlCondition.value.substring(0, sqlCondition.value.lastIndexOf('and'));
+
+      return sqlCondition;
     } catch (error) {
       Logger.error(error);
+      return null;
     }
   }
 

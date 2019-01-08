@@ -83,10 +83,8 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   */
   async get(entity: IoTComponent, params: Array<KeyValue>): Promise<any> {
     try {
-      let paramsArray = new Array<DBParameters>();
-      let sqlCondition = new KeyValue('sqlCondition', '');
-      await DatabaseHelper.prepareCondition(params, paramsArray, sqlCondition);
-
+      let sqlCondition = await DatabaseHelper.prepareCondition(params);
+      let paramsArray = await DatabaseHelper.getParameters(params);
       let tableName = await DatabaseHelper.getTableName(entity);
       let attributesStr = await DatabaseHelper.getEntityAttributes(entity);
 
@@ -117,10 +115,8 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   */
   async getColumn(params: Array<KeyValue>, columnName: string): Promise<any> {
     try {
-      let paramsArray = new Array<DBParameters>();
-      let sqlCondition = new KeyValue('sqlCondition', '');
-      await DatabaseHelper.prepareCondition(params, paramsArray, sqlCondition);
-
+      let paramsArray = await DatabaseHelper.getParameters(params);
+      let sqlCondition = await DatabaseHelper.prepareCondition(params);
       let sqlCommand = `select ${columnName} from T_IoTComponent ${sqlCondition.value} FOR JSON AUTO`;
 
       let databaseService = new DatabaseService();
@@ -148,9 +144,6 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   async updateConfig(params: Array<KeyValue>): Promise<Result> {
     try {
       let paramsArray = await DatabaseHelper.getParameters(params);
-      // paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
-      // paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
-      // paramsArray.push(new DBParameters('Configuration', params.find(e => e.key === 'Configuration').value, mssql.NVarChar));
 
       let databaseService = new DatabaseService();
       let configDB = new DatabaseConfiguration();
@@ -176,9 +169,6 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   async updateReport(params: Array<KeyValue>): Promise<Result> {
     try {
       let paramsArray = await DatabaseHelper.getParameters(params);
-      // paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
-      // paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
-      // paramsArray.push(new DBParameters('ReportedData', params.find(e => e.key === 'ReportedData').value, mssql.NVarChar));
 
       let databaseService = new DatabaseService();
       let config = new DatabaseConfiguration();
