@@ -4,8 +4,9 @@ import { DeviceRepository } from '../repository/device-repository';
 import { EventsService } from '../../common/event';
 import { ResponsePayload } from '../models/response-payload';
 import { Message } from '../models/message';
-import { KeyValue } from '../models/key-value';
 import { JsonValidator } from '../../common/json.validator.service';
+import { MessageManagerService } from '../../common/message-manager.service';
+import { KeyValue } from '../models/key-value';
 
 export class ReportsService {
   moduleName = "ComponentService/Report";
@@ -44,13 +45,8 @@ export class ReportsService {
   */
   async setReport(message: Message) {
     try {
-      let params = new Array<KeyValue>();
-      if (message.payload.deviceID) {
-        params.push(new KeyValue('ID', message.payload.deviceID));
-      }
-      if (message.payload.typeName) {
-        params.push(new KeyValue('TypeName', message.payload.typeName));
-      }
+      let params = await MessageManagerService.getCommonParameters(message.payload);
+
       if (message.payload.data) {
         params.push(new KeyValue('ReportedData', message.payload.data));
       }
@@ -90,13 +86,7 @@ export class ReportsService {
   */
   async getReport(message: Message) {
     try {
-      let params = new Array<KeyValue>();
-      if (message.payload.deviceID) {
-        params.push(new KeyValue('ID', message.payload.deviceID));
-      }
-      if (message.payload.typeName) {
-        params.push(new KeyValue('TypeName', message.payload.typeName));
-      }
+      let params = await MessageManagerService.getCommonParameters(message.payload);
 
       let deviceRepo = new DeviceRepository();
       let data = await deviceRepo.getColumn(params, 'reportedData');

@@ -3,12 +3,13 @@ import { Logger } from '../../common/logger.service';
 import { DeviceRepository } from '../repository/device-repository';
 import { IoTComponent } from '../models/iot-component';
 import { EventsService } from '../../common/event';
-import { KeyValue } from '../models/key-value';
 import { ResponsePayload } from '../models/response-payload';
 import { Message } from '../models/message';
 import { JsonValidator } from '../../common/json.validator.service';
 import { IoTTypeRepository } from '../repository/type-repository';
 import { IoTComponentType } from '../models/iot-component-type';
+import { MessageManagerService } from '../../common/message-manager.service';
+import { KeyValue } from '../models/key-value';
 
 export class ConfigurationService {
   moduleName = 'ComponentService/Configuration';
@@ -88,7 +89,7 @@ export class ConfigurationService {
   */
   async getIoTDevice(message: Message) {
     try {
-      let params = await this.getParameters(message.payload);
+      let params = await MessageManagerService.getCommonParameters(message.payload);
 
       let deviceRepo = new DeviceRepository();
       let data = await deviceRepo.get(new IoTComponent(), params);
@@ -144,7 +145,7 @@ export class ConfigurationService {
   */
   async getIoTType(message: Message) {
     try {
-      let params = await this.getParameters(message.payload);
+      let params = await MessageManagerService.getCommonParameters(message.payload);
 
       let deviceRepo = new IoTTypeRepository();
       let data = await deviceRepo.get(new IoTComponentType(), params);
@@ -172,7 +173,10 @@ export class ConfigurationService {
   */
   async setConfig(message: Message) {
     try {
-      let params = await this.getParameters(message.payload);
+      let params = await MessageManagerService.getCommonParameters(message.payload);
+      if (message.payload.data) {
+        params.push(new KeyValue('Configuration', message.payload.data));
+      }
 
       let validator = new JsonValidator();
       let isValid = await validator.validate(JSON.parse(message.payload.data), message.payload.typeName, PropertyType.Configuration);
@@ -204,7 +208,7 @@ export class ConfigurationService {
   */
   async getConfig(message: Message) {
     try {
-      let params = await this.getParameters(message.payload);
+      let params = await MessageManagerService.getCommonParameters(message.payload);
 
       let deviceRepo = new DeviceRepository();
       let data = await deviceRepo.getColumn(params, 'configuration');
@@ -268,28 +272,6 @@ export class ConfigurationService {
     } catch (error) {
       Logger.error(error);
       return false;
-    }
-  }
-
-  async getParameters(payload: any) {
-    try {
-      let params = new Array<KeyValue>();
-      if (payload.deviceID) {
-        params.push(new KeyValue('ID', payload.deviceID));
-      }
-      if (payload.typeName) {
-        params.push(new KeyValue('TypeName', payload.typeName));
-      }
-      if (payload.branchID) {
-        params.push(new KeyValue('QueueBranch_ID', payload.branchID));
-      }
-      if (payload.data) {
-        params.push(new KeyValue('Configuration', payload.data));
-      }
-      return params;
-    } catch (error) {
-      Logger.error(error);
-      return null;
     }
   }
 }
