@@ -30,10 +30,10 @@ export class JsonValidator {
         let valid = validate(object);
 
         if(valid) {
-          return true;
+          return valid;
         } else {
           console.log(validate.errors);
-          return false;
+          return valid;
         }
       } else {
         return false;
