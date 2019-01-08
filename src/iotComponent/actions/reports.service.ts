@@ -45,7 +45,7 @@ export class ReportsService {
   async setReport(message: Message) {
     try {
       let params = new Array<KeyValue>();
-      if (message.payload.deviceID && message.payload.deviceID > 0) {
+      if (message.payload.deviceID) {
         params.push(new KeyValue('ID', message.payload.deviceID));
       }
       if (message.payload.typeName) {
@@ -91,7 +91,7 @@ export class ReportsService {
   async getReport(message: Message) {
     try {
       let params = new Array<KeyValue>();
-      if (message.payload.deviceID && message.payload.deviceID > 0) {
+      if (message.payload.deviceID) {
         params.push(new KeyValue('ID', message.payload.deviceID));
       }
       if (message.payload.typeName) {

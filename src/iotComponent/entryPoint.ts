@@ -115,7 +115,6 @@ export class EntryPoint {
   async loadEntities(message: Message): Promise<Result> {
     try {
       let topicName = this.getModuleName(message.payload.target);
-      // let result = await communicationService.getData(message.payload, moduleName, data);
       let data = new Array<any>();
       let result = await this.sendToModule(message.payload, topicName, 'CVMServer', data);
 

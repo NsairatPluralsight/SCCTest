@@ -90,10 +90,10 @@ export class ConfigurationService {
     try {
       let params = new Array<KeyValue>();
 
-      if(message.payload.deviceID && message.payload.deviceID > 0) {
+      if(message.payload.deviceID) {
         params.push(new KeyValue('ID', message.payload.deviceID));
       }
-      if(message.payload.branchID && message.payload.branchID > 0) {
+      if(message.payload.branchID) {
         params.push(new KeyValue('QueueBranch_ID', message.payload.branchID));
       }
       if(message.payload.typeName) {
@@ -156,7 +156,7 @@ export class ConfigurationService {
   try {
     let params = new Array<KeyValue>();
 
-    if(message.payload.deviceID && message.payload.deviceID > 0) {
+    if(message.payload.deviceID) {
       params.push(new KeyValue('ID', message.payload.deviceID));
     }
     if(message.payload.typeName) {
@@ -190,7 +190,7 @@ export class ConfigurationService {
   async setConfig(message: Message) {
     try {
       let params = new Array<KeyValue>();
-      if (message.payload.deviceID && message.payload.deviceID > 0) {
+      if (message.payload.deviceID) {
         params.push(new KeyValue('ID', message.payload.deviceID));
       }
       if (message.payload.typeName) {
@@ -231,7 +231,7 @@ export class ConfigurationService {
   async getConfig(message: Message) {
     try {
       let params = new Array<KeyValue>();
-      if (message.payload.deviceID && message.payload.deviceID > 0) {
+      if (message.payload.deviceID) {
         params.push(new KeyValue('ID', message.payload.deviceID));
       }
       if (message.payload.typeName) {
