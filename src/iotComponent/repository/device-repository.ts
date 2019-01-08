@@ -89,11 +89,9 @@ export class DeviceRepository implements IRepository<IoTComponent> {
 
       let tableName = await DatabaseHelper.getTableName(entity);
       let attributesStr = await DatabaseHelper.getEntityAttributes(entity);
-
       let sqlCommand = `select ${attributesStr} from ${tableName} ${sqlCondition.value} FOR JSON AUTO`;
       let databaseService = new DatabaseService();
       let config = new DatabaseConfiguration();
-
       await databaseService.open(config);
 
       let device = await databaseService.get(sqlCommand, paramsArray);
