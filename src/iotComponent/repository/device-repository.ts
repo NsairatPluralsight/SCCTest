@@ -89,9 +89,11 @@ export class DeviceRepository implements IRepository<IoTComponent> {
 
       let tableName = await DatabaseHelper.getTableName(entity);
       let attributesStr = await DatabaseHelper.getEntityAttributes(entity);
+
       let sqlCommand = `select ${attributesStr} from ${tableName} ${sqlCondition.value} FOR JSON AUTO`;
       let databaseService = new DatabaseService();
       let config = new DatabaseConfiguration();
+
       await databaseService.open(config);
 
       let device = await databaseService.get(sqlCommand, paramsArray);
@@ -145,10 +147,10 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   */
   async updateConfig(params: Array<KeyValue>): Promise<Result> {
     try {
-      let paramsArray = new Array<DBParameters>();
-      paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
-      paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
-      paramsArray.push(new DBParameters('Configuration', params.find(e => e.key === 'Configuration').value, mssql.NVarChar));
+      let paramsArray = await DatabaseHelper.getParameters(params);
+      // paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
+      // paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
+      // paramsArray.push(new DBParameters('Configuration', params.find(e => e.key === 'Configuration').value, mssql.NVarChar));
 
       let databaseService = new DatabaseService();
       let configDB = new DatabaseConfiguration();
@@ -173,10 +175,10 @@ export class DeviceRepository implements IRepository<IoTComponent> {
   */
   async updateReport(params: Array<KeyValue>): Promise<Result> {
     try {
-      let paramsArray = new Array<DBParameters>();
-      paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
-      paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
-      paramsArray.push(new DBParameters('ReportedData', params.find(e => e.key === 'ReportedData').value, mssql.NVarChar));
+      let paramsArray = await DatabaseHelper.getParameters(params);
+      // paramsArray.push(new DBParameters('ID', params.find(e => e.key === 'ID').value, mssql.BigInt));
+      // paramsArray.push(new DBParameters('TypeName', params.find(e => e.key === 'TypeName').value, mssql.NVarChar));
+      // paramsArray.push(new DBParameters('ReportedData', params.find(e => e.key === 'ReportedData').value, mssql.NVarChar));
 
       let databaseService = new DatabaseService();
       let config = new DatabaseConfiguration();

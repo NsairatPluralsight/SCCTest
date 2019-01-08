@@ -37,6 +37,15 @@ export class DatabaseHelper {
     }
   }
 
+  static async getParameters(params: Array<KeyValue>) {
+    try {
+      let dbParams = params.map(element => { return new DBParameters(element.key, element.value, this.getDBType(element.key))});
+      return dbParams;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   static getDBType(key: string): mssql.ISqlTypeFactoryWithNoParams {
     try {
       switch (key) {
