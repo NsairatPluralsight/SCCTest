@@ -25,6 +25,11 @@ export class DatabaseHelper {
     }
   }
 
+      /**
+   * @summary genreate the sql condition
+   * @param {Array<KeyValue>} params - the conditionn parameters
+   * @returns {Promise<KeyValue> } - return sql condition as key value .
+   */
   static async prepareCondition(params: Array<KeyValue>): Promise<KeyValue> {
     try {
       let sqlCondition = new KeyValue(Constants.cSQL_CONDITION, Constants.cWHERE);
