@@ -3,8 +3,10 @@
   "compilerOptions": {
     "outDir": "../out-tsc/spec",
     "types": [
-      "jasmine",
-      "node"
+      "node",
+      "mocha",
+      "chai",
+      "ts-sinon"
     ]
   },
   "files": [

@@ -1,0 +1,75 @@
+{
+  "title": "Component",
+  "description": "The Component schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The id of the component",
+      "type": "number"
+    },
+    "orgID": {
+      "description": "The organization ID that the component belongs to",
+      "type": "number"
+    },
+    "typeName": {
+      "description": "The type of the component ex. mainLCD, counterLCD",
+      "type": "string"
+    },
+    "name_L1": {
+      "description": "The name of the component in first language",
+      "type": "string"
+    },
+    "name_L2": {
+      "description": "The name of the component in second language",
+      "type": "string"
+    },
+    "name_L3": {
+      "description": "The name of the component in third language",
+      "type": "string"
+    },
+    "name_L4": {
+      "description": "The name of the component in fourth language",
+      "type": "string"
+    },
+    "queueBranch_ID": {
+      "description": "The branch ID that the component belongs to",
+      "type": "number"
+    },
+    "reportedData": {
+      "description": "The reported data of a component as json",
+      "type": "string"
+    },
+    "configuration": {
+      "description": "The configuration data for a component as json",
+      "type": "string"
+    },
+    "relatedClassName": {
+      "description": "The class name that represent this component",
+      "type": "string"
+    },
+    "relatedObject_ID": {
+      "description": "The ID of the related object",
+      "type": "number"
+    },
+    "identity": {
+      "description": "the mac address or ID , if the relatedObject_ID is filled this will be the same value ",
+      "type": "string"
+    },
+    "address": {
+      "description": "IP Adress or machine name",
+      "type": "string"
+    },
+    "description": {
+      "description": "description about the component",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "orgID",
+    "typeName",
+    "name_L1",
+    "queueBranch_ID",
+    "identity"
+  ]
+}

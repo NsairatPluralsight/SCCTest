@@ -1,10 +1,11 @@
-import { Logger } from "../../common/logger.service";
-import { KeyValue } from "../models/key-value";
-import { DBParameters } from "../models/database-configuration";
+import { Logger } from "../shared/services/logger.service";
+import { KeyValue } from "../shared/models/key-value";
+import { DBParameters } from "../shared/models/database-configuration";
 import * as mssql from 'mssql';
+import { Constants } from "../shared/models/constants";
 
 export class DatabaseHelper {
-  static table_Prefex = "t_";
+  static table_Prefex = "cst_";
   static jsonKey = "JSON_F52E2B61-18A1-11d1-B105-00805F49916B";
 
     /**
@@ -26,12 +27,12 @@ export class DatabaseHelper {
 
   static async prepareCondition(params: Array<KeyValue>): Promise<KeyValue> {
     try {
-      let sqlCondition = new KeyValue('sqlCondition', 'where ');
+      let sqlCondition = new KeyValue(Constants.cSQL_CONDITION, Constants.cWHERE);
 
       params.forEach(element => {
-        sqlCondition.value += `${element.key} = @${element.key} and `;
+        sqlCondition.value += `${element.key} = @${element.key} ${Constants.cAND} `;
       });
-      sqlCondition.value = sqlCondition.value.substring(0, sqlCondition.value.lastIndexOf('and'));
+      sqlCondition.value = sqlCondition.value.substring(0, sqlCondition.value.lastIndexOf(Constants.cAND));
 
       return sqlCondition;
     } catch (error) {
@@ -52,25 +53,25 @@ export class DatabaseHelper {
   static getDBType(key: string): mssql.ISqlTypeFactoryWithNoParams {
     try {
       switch (key) {
-        case 'ID':
-        case 'QueueBranch_ID':
-        case 'RelatedObject_ID':
-        case 'OrgID':
+        case Constants.cID:
+        case Constants.cQUEUE_BRANCH_ID:
+        case Constants.cRELATED_OBJECT_ID:
+        case Constants.cOrg_ID:
          return mssql.BigInt;
-        case 'TypeName':
-        case 'Name_L1':
-        case 'Name_L2':
-        case 'Name_L3':
-        case 'Name_L4':
-        case 'ReportedData':
-        case 'Configuration':
-        case 'ClassName':
-        case 'Identity':
-        case 'Address':
-        case 'Description':
-        case 'CaptionKey':
-        case 'ConfigurationSchema':
-        case 'ReportedDataSchema':
+        case Constants.cTYPE_NAME:
+        case Constants.cNAME_L1:
+        case Constants.cNAME_L2:
+        case Constants.cNAME_L3:
+        case Constants.cNAME_L4:
+        case Constants.cREPORTED_DATA:
+        case Constants.cCONFIGURATION:
+        case Constants.cRELATED_CLASS_NAME:
+        case Constants.cIDENTITY:
+        case Constants.cADDRESS:
+        case Constants.cDESCRIPTION:
+        case Constants.cCAPTION_KEY:
+        case Constants.cCONFIGURATION_SCHEMA:
+        case Constants.cREPORTED_DATA_SCHEMA:
          return mssql.NVarChar;
       }
     } catch (error) {

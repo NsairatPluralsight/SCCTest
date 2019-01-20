@@ -1,20 +1,22 @@
 
-import { Result } from './models/enum';
-import { Logger } from '../common/logger.service';
+import { Result } from './shared/models/enum';
+import { Logger } from './shared/services/logger.service';
 import { ReportsService } from './actions/reports.service';
 import { ConfigurationService } from './actions/configuration.service';
 import { RegistrationService } from './actions/registration.service';
-import { EventsService } from '../common/event';
-import { Message } from './models/message';
-import { Guid } from './models/guid';
+import { EventsService } from './shared/models/event';
+import { Message } from './shared/models/message';
+import { Guid } from './shared/models/guid';
+import { ComponentManager } from './actions/component-manager.service';
+import { Constants } from './shared/models/constants';
 var rabbitMQClient = require("../rabbitMQClient");
 
 export class EntryPoint {
   keys = ["ComponentService.*"];
   queueName = "ComponentService";
-  rabbitMQClient: any;
   topicPrefix = "CVMServer/";
   sourceID = '';
+  rabbitMQClient: any;
 
   constructor() {
     this.rabbitMQClient = new rabbitMQClient(this.queueName, this.keys);
@@ -25,11 +27,10 @@ export class EntryPoint {
   * @summary intialaize rabbit MQ client start listining to the ComponentService queue
   */
   async start() {
-    let that = this;
     this.rabbitMQClient.receive(async (request, replay) => { await this.processRequest(request, replay) });
 
     let events = new EventsService();
-    events.broadcastMessage.on('event', this.broadcastMessage);
+    events.broadcastMessage.on(Constants.cEVENT, this.broadcastMessage);
   }
 
   /**
@@ -43,22 +44,27 @@ export class EntryPoint {
       let topic = request.topicName.split("/")[1];
 
       switch (topic) {
-        case "Registration":
+        case Constants.cREGISTRATION:
           let registration = new RegistrationService();
-          result = await registration.registerDevice(request);
+          result = await registration.registerComponent(request);
           reply = request;
           break;
-        case 'Configuration':
+        case Constants.cMANAGER:
+          let componentManager = new ComponentManager();
+          result = await componentManager.processMessageRequest(request);
+          reply = request;
+          break;
+        case Constants.cCONFIGURATION:
           let configuration = new ConfigurationService();
           result = await configuration.processMessageRequest(request);
           reply = request;
           break;
-        case 'Report':
+        case Constants.cREPORT:
           let reports = new ReportsService();
           result = await reports.processMessageRequest(request);
           reply = request;
           break;
-        case "Data":
+        case Constants.cDATA:
           result = await this.loadEntities(request);
           reply = request;
           break;
@@ -93,7 +99,7 @@ export class EntryPoint {
   */
   async sendToModule(payload: any, topic: string, moduleName: string, reply: Array<any>): Promise<Result> {
     try {
-      let message = new Message(this.getSourceId());
+      let message = new Message(this.getSourceID());
       message.topicName = topic;
       message.payload = payload;
 
@@ -116,7 +122,7 @@ export class EntryPoint {
     try {
       let topicName = this.getModuleName(message.payload.target);
       let data = new Array<any>();
-      let result = await this.sendToModule(message.payload, topicName, 'CVMServer', data);
+      let result = await this.sendToModule(message.payload, topicName, Constants.cCVM_SERVER, data);
 
       if (result == Result.Success) {
 
@@ -158,11 +164,10 @@ export class EntryPoint {
   * @summary return a new guid if sourse is not defined
   * @return {string} guid.
   */
-  getSourceId(): string {
+  getSourceID(): string {
     if (this.sourceID == undefined) {
-      this.sourceID = new Guid().Guid();
+      this.sourceID = Guid.getGuid();
     }
     return this.sourceID;
   }
-
 }

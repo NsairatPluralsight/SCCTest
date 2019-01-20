@@ -1,4 +1,4 @@
-export class IoTComponent {
+export class Component {
   id: number;
   orgID: number;
   typeName: string;
@@ -9,11 +9,13 @@ export class IoTComponent {
   queueBranch_ID: number;
   reportedData: string;
   configuration: string;
-  className: string;
+  relatedClassName: string;
   relatedObject_ID: number;
   identity: string;
   address: string;
   description: string;
+  CreationTime: any;
+  LastUpdateTime: any;
 
   constructor() {
     this.id = -1;
@@ -26,10 +28,12 @@ export class IoTComponent {
     this.queueBranch_ID = -1;
     this.reportedData = '';
     this.configuration = '';
-    this.className = '';
+    this.relatedClassName = '';
     this.relatedObject_ID = -1;
     this.identity = '';
     this.address = '';
     this.description = '';
+    this.CreationTime = new Date();
+    this.LastUpdateTime = new Date();
   }
 }

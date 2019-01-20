@@ -1,6 +1,6 @@
-import { Guid } from './iotComponent/models/guid';
-import { Result } from './iotComponent/models/enum';
-import { Logger } from './common/logger.service';
+import { Guid } from './component-service/shared/models/guid';
+import { Result } from './component-service/shared/models/enum';
+import { Logger } from './component-service/shared/services/logger.service';
 
 var amqp = require('amqplib/callback_api');
 const EventEmitter = require('events');
@@ -11,7 +11,7 @@ let RabbitMQconnection = "amqp://guest:guest@localhost";
 
 class rabbitMQClient {
     constructor(queueName, Topics) {
-        this.id = new Guid().Guid().substring(3, 10)
+        this.id = Guid.getGuid().substring(3, 10)
         this.SubscribTopics = Topics;
         this.RPC_Queue = queueName;
         this.RPC_Queue_Reply = queueName + "_Reply_" + this.id;
@@ -167,7 +167,7 @@ class rabbitMQClient {
                     }).value;
 
                     //Function to handle the comming events
-                    let random_correlationId = new Guid().Guid();
+                    let random_correlationId = Guid.getGuid();
                     var handleReply = function (correlationId, msg) {
                         if (correlationId == random_correlationId) {
                             Reply.push(msg);
@@ -180,6 +180,7 @@ class rabbitMQClient {
                     that.MessageRecieveEmitter.on('event', handleReply);
 
                     //Send the message to queue
+                    console.log("Real message sent in test");
                     console.log("Send Request");
                     that.channel.sendToQueue(QueueName,
                         new Buffer(Message.toString()),

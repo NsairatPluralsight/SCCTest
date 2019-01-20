@@ -1,17 +1,18 @@
-import { Commands, Result, PropertyType } from '../models/enum';
-import { Logger } from '../../common/logger.service';
-import { DeviceRepository } from '../repository/device-repository';
-import { EventsService } from '../../common/event';
-import { ResponsePayload } from '../models/response-payload';
-import { Message } from '../models/message';
-import { JsonValidator } from '../../common/json.validator.service';
-import { MessageManagerService } from '../../common/message-manager.service';
-import { KeyValue } from '../models/key-value';
+import { Commands, Result, PropertyType } from '../shared/models/enum';
+import { Logger } from '../shared/services/logger.service';
+import { ComponentRepository } from '../repositories/component-repository';
+import { ResponsePayload } from '../shared/models/response-payload';
+import { Message } from '../shared/models/message';
+import { JsonValidator } from '../shared/services/json.validator.service';
+import { MessageManagerService } from '../shared/services/message-manager.service';
+import { KeyValue } from '../shared/models/key-value';
+import { Constants } from '../shared/models/constants';
+import { Component } from '../shared/models/component';
 
 export class ReportsService {
   moduleName = "ComponentService/Report";
   broadcastTopic = "ComponentService.broadcast";
-  reportTopicName = 'ComponentService/DeviceReport_Changed';
+  reportTopicName = 'ComponentService/Component_Report_Changed';
 
   /**
   * @summary handle the messages with sub topic 'Report'
@@ -39,7 +40,7 @@ export class ReportsService {
   }
 
   /**
-  * @summary set IOT device report by device ID
+  * @summary set Component reported data
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Report'
   * @return {Promise<number>} Result enum wrapped in a promise.
   */
@@ -48,7 +49,7 @@ export class ReportsService {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 
       if (message.payload.data) {
-        params.push(new KeyValue('ReportedData', message.payload.data));
+        params.push(new KeyValue(Constants.cREPORTED_DATA, message.payload.data));
       }
 
       let validator = new JsonValidator();
@@ -56,16 +57,11 @@ export class ReportsService {
 
       let result = Result.Failed;
       if (isValid) {
-        let deviceRepo = new DeviceRepository();
-        result = await deviceRepo.updateReport(params);
+        let componentRepo = new ComponentRepository();
+        result = await componentRepo.updateReport(params);
 
         if (result == Result.Success) {
-          let broadcastMessage = new Message(this.moduleName);
-          broadcastMessage.payload = message.payload;
-          broadcastMessage.topicName = this.reportTopicName;
-
-          let events = new EventsService();
-          events.broadcastMessage.emit('event', this.broadcastTopic, broadcastMessage);
+          MessageManagerService.broadcastMessage(this.reportTopicName, this.moduleName, message);
         }
       }
 
@@ -80,7 +76,7 @@ export class ReportsService {
   }
 
   /**
-  * @summary get IOT device report by device ID
+  * @summary get Component reported data
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Report'
   * @return {Promise<number>} Result enum wrapped in a promise.
   */
@@ -88,8 +84,8 @@ export class ReportsService {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 
-      let deviceRepo = new DeviceRepository();
-      let data = await deviceRepo.getColumn(params, 'reportedData');
+      let componentRepo = new ComponentRepository();
+      let data = await componentRepo.getColumn(new Component(), params, Constants.cREPORTED_DATA.toLowerCase());
       let payload = new ResponsePayload();
 
       if (data) {
@@ -106,5 +102,4 @@ export class ReportsService {
       return Result.Failed;
     }
   }
-
 }

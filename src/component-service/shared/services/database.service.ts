@@ -1,5 +1,5 @@
 import * as mssql from 'mssql';
-import { Logger } from '../../common/logger.service';
+import { Logger } from './logger.service';
 import { DBResult, DBParameters, DatabaseConfiguration } from '../models/database-configuration';
 import { Result } from '../models/enum';
 
