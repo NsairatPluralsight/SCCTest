@@ -14,8 +14,8 @@ export class Component {
   identity: string;
   address: string;
   description: string;
-  CreationTime: any;
-  LastUpdateTime: any;
+  creationTime: any;
+  lastUpdateTime: any;
 
   constructor() {
     this.id = -1;
@@ -33,7 +33,7 @@ export class Component {
     this.identity = '';
     this.address = '';
     this.description = '';
-    this.CreationTime = new Date();
-    this.LastUpdateTime = new Date();
+    this.creationTime = new Date();
+    this.lastUpdateTime = new Date();
   }
 }

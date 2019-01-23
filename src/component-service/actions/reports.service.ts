@@ -17,9 +17,9 @@ export class ReportsService {
   /**
   * @summary handle the messages with sub topic 'Report'
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Report'
-  * @return {Promise<number>} Result enum wrapped in a promise.
+  * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async processMessageRequest(message: Message) {
+  async processMessageRequest(message: Message): Promise<Result> {
     try {
       var command = message.topicName.replace(this.moduleName + "/", "");
       let result = Result.Failed;
@@ -42,9 +42,9 @@ export class ReportsService {
   /**
   * @summary set Component reported data
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Report'
-  * @return {Promise<number>} Result enum wrapped in a promise.
+  * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async setReport(message: Message) {
+  async setReport(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 
@@ -78,9 +78,9 @@ export class ReportsService {
   /**
   * @summary get Component reported data
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Report'
-  * @return {Promise<number>} Result enum wrapped in a promise.
+  * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async getReport(message: Message) {
+  async getReport(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 

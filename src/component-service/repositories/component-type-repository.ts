@@ -22,6 +22,12 @@ export class ComponentTypeRepository implements IRepository<ComponentType> {
     throw new Error("Method not implemented.");
   }
 
+  /**
+   * @async
+   * @summary - returns all the records in the Component Type Table
+   * @param {ComponentType} entity - instance of the ComponentType entity
+   * @return {Promise<any>} - set of records as json wrapped in a promise.
+   */
  async getAll(entity: ComponentType): Promise<any> {
     try {
       let tableName = await DatabaseHelper.getTableName(entity);
@@ -43,9 +49,17 @@ export class ComponentTypeRepository implements IRepository<ComponentType> {
       }
     } catch (error) {
       Logger.error(error);
+      return null;
     }
   }
 
+  /**
+   * @async
+   * @summary - returns Component Type object
+   * @param {ComponentType} entity - instance of the ComponentType entity
+   * @param {KeyValue[]} params - paramters sent to generate condition for the query
+   * @return {Promise<ComponentType>} - Component Type wrapped in a promise.
+   */
   async get(entity: ComponentType, params: KeyValue[]): Promise<ComponentType> {
     try {
       let paramsArray = await DatabaseHelper.getParameters(params);
@@ -68,6 +82,7 @@ export class ComponentTypeRepository implements IRepository<ComponentType> {
       }
     } catch (error) {
       Logger.error(error);
+      return null;
     }
   }
 }

@@ -21,7 +21,7 @@ export class ConfigurationService {
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async processMessageRequest(message: Message) {
+  async processMessageRequest(message: Message): Promise<Result> {
     try {
       var command = message.topicName.replace(this.moduleName + "/", "");
       let result = Result.Failed;
@@ -46,7 +46,7 @@ export class ConfigurationService {
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async setConfig(message: Message) {
+  async setConfig(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
       if (message.payload.data) {
@@ -81,7 +81,7 @@ export class ConfigurationService {
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async getConfig(message: Message) {
+  async getConfig(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 

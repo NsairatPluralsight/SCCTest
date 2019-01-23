@@ -22,7 +22,7 @@ export class ComponentManager {
   * @param {Message} message - the message that resieved from MQ
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async processMessageRequest(message: Message) {
+  async processMessageRequest(message: Message): Promise<Result> {
     try {
       var command = message.topicName.replace(this.moduleName + "/", "");
       let result = Result.Failed;
@@ -62,12 +62,11 @@ export class ComponentManager {
   * @param {Message} message - the message that resieved from MQ
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async getComponents(message: Message) {
+  async getComponents(message: Message): Promise<Result> {
     try {
       let componentRepo = new ComponentRepository();
 
-      let component = new Component();
-      let data = await componentRepo.getAll(component);
+      let data = await componentRepo.getAll(new Component());
       let payload = new ResponsePayload();
 
       if (data) {
@@ -90,7 +89,7 @@ export class ComponentManager {
   * @param {Message} message - the message that resieved from MQ
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async getComponent(message: Message) {
+  async getComponent(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 
@@ -118,7 +117,7 @@ export class ComponentManager {
     * @param {Message} message - the message that resieved from MQ
     * @return {Promise<Result>} Result enum wrapped in a promise.
     */
-  async getAllComponentTypes(message: Message) {
+  async getAllComponentTypes(message: Message): Promise<Result> {
     try {
       let componentRepo = new ComponentTypeRepository();
 
@@ -145,7 +144,7 @@ export class ComponentManager {
   * @param {Message} message - the message that resieved from MQ
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async getComponentType(message: Message) {
+  async getComponentType(message: Message): Promise<Result> {
     try {
       let params = await MessageManagerService.getCommonParameters(message.payload);
 
@@ -222,7 +221,7 @@ export class ComponentManager {
   * @param {Message} message - the message that resieved from client
   * @return {Promise<Result>} Result enum wrapped in a promise.
   */
-  async executeCommand(message: Message) {
+  async executeCommand(message: Message): Promise<Result> {
     try {
       let result = await MessageManagerService.broadcastMessage(this.executeCommandTopicName, this.moduleName, message)
       let payload = new ResponsePayload();

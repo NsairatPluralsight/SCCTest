@@ -3,13 +3,20 @@ import { KeyValue } from "../models/key-value";
 import { EventsService } from '../models/event';
 import { Message } from '../models/message';
 import { Constants } from '../models/constants';
+import { EventEmitter } from 'events';
 
 export class MessageManagerService {
   static broadcastTopic = 'ComponentService.broadcast';
+  static eventTest = new EventEmitter();
 
   constructor() { }
 
-  static async getCommonParameters(payload: any) {
+/**
+* @summary extracts the parameters from payload
+* @param {any} payload - the payload that resieved from client
+* @return {Promise<KeyValue>} - paramters as KeyValue wrapped in a promise.
+*/
+  static async getCommonParameters(payload: any): Promise<KeyValue[]> {
     try {
       let params = new Array<KeyValue>();
       if (payload.componentID) {
@@ -38,11 +45,12 @@ export class MessageManagerService {
     }
   }
 
-  /**
+/**
 * @summary broadcast a message on the Component
-* @param {Message} topic - the message topic to broadcast on
+* @param {string} topic - the message topic to broadcast on
+* @param {string} moduleName - the module name that sent the broadcast
 * @param {Message} message - the message that resieved from client
-* @return {Promise<boolean>} boolean wrapped in a promise.
+* @return {Promise<boolean>} - boolean wrapped in a promise.
 */
   static async broadcastMessage(topic: string, moduleName: string, message: Message) {
     try {
@@ -50,8 +58,7 @@ export class MessageManagerService {
       broadcastMessage.payload = message.payload;
       broadcastMessage.topicName = topic;
 
-      let events = new EventsService();
-      let result = events.broadcastMessage.emit(Constants.cEVENT, this.broadcastTopic, broadcastMessage);
+      let result = EventsService.broadcastMessage.emit(Constants.cEVENT, this.broadcastTopic, broadcastMessage);
 
       return result;
     } catch (error) {

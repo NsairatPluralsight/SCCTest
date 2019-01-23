@@ -16,7 +16,7 @@ export class RegistrationService {
 * @param {Message} message - the message that resieved from MQ with sub topic name 'Registration'
 * @return {Promise<Result>} Result enum wrapped in a promise.
 */
-  async registerComponent(message: Message) {
+  async registerComponent(message: Message): Promise<Result> {
     try {
       let result = await this.addComponent(message);
       return result;
@@ -32,7 +32,7 @@ export class RegistrationService {
 * @param {Message} message - the message that resieved from MQ with sub topic name 'Registration'
 * @return {Promise<Result>} Result enum wrapped in a promise.
 */
-  async addComponent(message: Message) {
+  async addComponent(message: Message): Promise<Result> {
     try {
       let component = JSON.parse(message.payload.data);
 
@@ -82,9 +82,8 @@ export class RegistrationService {
       if (componentSchema && component) {
         let validator = new JsonValidator();
         isValid = await validator.isValid(component, componentSchema);
-      } else {
-        isValid = false;
       }
+
       return isValid;
     } catch (error) {
       Logger.error(error);
@@ -96,7 +95,7 @@ export class RegistrationService {
 * @summary get the component schema from file
 * @return {Promise<any>} Schema as any wrapped in a promise.
 */
-  async getSchema(): Promise<any> {
+  private async getSchema(): Promise<any> {
     try {
       let schema = await fs.readJSONSync(__dirname + this.schemaPath);
       return schema;

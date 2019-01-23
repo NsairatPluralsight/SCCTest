@@ -48,7 +48,6 @@ export class ComponentRepository implements IRepository<Component> {
   /**
   * @summary get a list of component
   * @param {Component} entity - entity
-  * @param {Array<KeyValue>} params - the paramters for the sql query
   * @returns {Promise<any>} - list of component as JSON string.
   */
   async getAll(entity: Component): Promise<any> {
@@ -112,6 +111,7 @@ export class ComponentRepository implements IRepository<Component> {
   * @summary get an component Configuration
   * @param {Component} entity - entity
   * @param {Array<KeyValue>} params - the paramters for the sql query
+  * @param {string} columnName - the column Name you want select
   * @returns {Promise<any>} - component column configuration as JSON string.
   */
   async getColumn(entity: Component, params: Array<KeyValue>, columnName: string): Promise<any> {
@@ -152,10 +152,10 @@ export class ComponentRepository implements IRepository<Component> {
 
       await databaseService.open(config);
       let result = await databaseService.executeProcedure(Constants.cUPDATE_COMPONENT, paramsArray);
-      if (result) {
-        return Result.Failed;
-      } else {
+      if (result == Result.Success) {
         return Result.Success;
+      } else {
+        return Result.Failed;
       }
     } catch (error) {
       Logger.error(error);
@@ -177,10 +177,10 @@ export class ComponentRepository implements IRepository<Component> {
 
       await databaseService.open(configDB);
       let result = await databaseService.executeProcedure(Constants.cUPDATE_COMPONENT__CONFIGURATION, paramsArray);
-      if (result == Result.Failed) {
-        return Result.Failed;
-      } else {
+      if (result == Result.Success) {
         return Result.Success;
+      } else {
+        return Result.Failed;
       }
     } catch (error) {
       Logger.error(error);
@@ -202,10 +202,10 @@ export class ComponentRepository implements IRepository<Component> {
 
       await databaseService.open(config);
       let result = await databaseService.executeProcedure(Constants.cUPDATE_COMPONENT_REPORTED_DATA, paramsArray);
-      if (result == Result.Failed) {
-        return Result.Failed;
-      } else {
+      if (result == Result.Success) {
         return Result.Success;
+      } else {
+        return Result.Failed;
       }
     } catch (error) {
       Logger.error(error);
@@ -221,17 +221,17 @@ export class ComponentRepository implements IRepository<Component> {
   async delete(params: Array<KeyValue>): Promise<Result> {
     try {
       let paramsArray = new Array<DBParameters>();
-      paramsArray.push(new DBParameters('IDs', params.find(e => e.key === 'IDs').value, mssql.NVarChar));
+      paramsArray.push(new DBParameters(Constants.cIDs, params.find(e => e.key === Constants.cIDs).value, mssql.NVarChar));
 
       let databaseService = new DatabaseService();
       let config = new DatabaseConfiguration();
 
       await databaseService.open(config);
       let result = await databaseService.executeProcedure(Constants.cDelete_COMPONENT, paramsArray);
-      if (result) {
-        return Result.Failed;
-      } else {
+      if (result == Result.Success) {
         return Result.Success;
+      } else {
+        return Result.Failed;
       }
     } catch (error) {
       Logger.error(error);

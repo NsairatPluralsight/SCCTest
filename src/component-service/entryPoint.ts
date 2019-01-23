@@ -29,13 +29,14 @@ export class EntryPoint {
   async start() {
     this.rabbitMQClient.receive(async (request, replay) => { await this.processRequest(request, replay) });
 
-    let events = new EventsService();
-    events.broadcastMessage.on(Constants.cEVENT, this.broadcastMessage);
+    EventsService.broadcastMessage.on(Constants.cEVENT, this.broadcastMessage);
   }
 
   /**
   * @async
   * @summary call back method to handle the resieved messages
+  * @param request
+  * @param reply
   * @returns {Promise<Result>} Result enum wrapped in a promise.
   */
   async processRequest(request: Message, reply: Message): Promise<Result> {
@@ -79,11 +80,13 @@ export class EntryPoint {
   /**
   * @async
   * @summary call back method to handle the broadcasts messages
+  * @param broadcastTopic - the topic you want to broadcast on
+  * @param message - the message you want broadcast
   * @returns {Promise<Result>} Result enum wrapped in a promise.
   */
-  async broadcastMessage(broadcastTopic: string, request: Message): Promise<Result> {
+  async broadcastMessage(broadcastTopic: string, message: Message): Promise<Result> {
     try {
-      let result = await this.rabbitMQClient.sendBroadcast(broadcastTopic, JSON.stringify(request));
+      let result = await this.rabbitMQClient.sendBroadcast(broadcastTopic, JSON.stringify(message));
       return result;
     }
     catch (error) {
@@ -95,6 +98,10 @@ export class EntryPoint {
   /**
   * @async
   * @summary sends a message to module using rabbit MQ Client
+  * @param {any} payload - the data you want to send with the message
+  * @param {string} topic - the message topic
+  * @param {string} moduleName - the name of the module you want communicate with
+  * @param {Array<any>} reply - the result from the target module
   * @returns {Promise<Result>} Result enum wrapped in a promise.
   */
   async sendToModule(payload: any, topic: string, moduleName: string, reply: Array<any>): Promise<Result> {
@@ -108,13 +115,13 @@ export class EntryPoint {
       return result;
     } catch (error) {
       Logger.error(error);
+      return Result.Failed;
     }
   }
 
   /**
   * @async
   * @summary return a list of objects of a specific entitiy , full object or object only contains {ID , Name}
-  * @param {string} entitieName - the entitie name you want to retrieve
   * @param {Message} message - the message that resieved from MQ with sub topic name 'Configuration'
   * @return {Promise<number>} Result enum wrapped in a promise.
   */
